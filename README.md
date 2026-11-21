@@ -49,6 +49,24 @@ Everything is stored on the device. There are no accounts, no servers, no analyt
 
 ---
 
+## Open the published app (iPhone & Android, no computer needed)
+
+The latest version is published with EAS Update and opens inside **Expo Go**:
+
+1. Install **Expo Go** (App Store / Play Store).
+2. Scan this QR code with the phone camera (iPhone) or with Expo Go (Android), or open the link on the phone:
+
+   `exp://u.expo.dev/59759913-e332-4629-928c-5d6b00e5315b?runtime-version=exposdk%3A58.0.0&channel-name=preview`
+
+   <img src="docs/expo-go-qr.svg" width="220" alt="QR code to open Daily Sync in Expo Go" />
+
+To publish a new version after changing code:
+
+```bash
+npx eas-cli@latest update --channel preview --environment preview --platform ios --message "What changed"
+npx eas-cli@latest update --channel preview --environment preview --platform android --message "What changed"
+```
+
 ## Quick start
 
 > You need a computer with **Node.js 20 or newer** and an **Android phone**.
