@@ -3,6 +3,7 @@
  * picker). The file contains all personal data, including journal entries,
  * so the UI warns users to store it somewhere private.
  */
+import { Platform } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -10,9 +11,15 @@ import * as Sharing from 'expo-sharing';
 import { exportBackup, MAX_BACKUP_BYTES, parseBackup, restoreBackup, RestoreFailure, type RestoreSummary } from '@/db/repositories/backupRepo';
 
 import { syncNotifications } from './notifications';
+import { shareOrDownload } from './webFiles';
 
 export async function shareBackupFile(date: string): Promise<void> {
   const envelope = await exportBackup();
+  if (Platform.OS === 'web') {
+    const blob = new Blob([JSON.stringify(envelope)], { type: 'application/json' });
+    await shareOrDownload(blob, `daily-sync-backup-${date}.json`, 'Daily Sync backup');
+    return;
+  }
   const file = new File(Paths.cache, `daily-sync-backup-${date}.json`);
   if (file.exists) file.delete();
   file.create();
@@ -39,6 +46,11 @@ export async function pickAndRestoreBackup(): Promise<PickResult> {
   if (result.canceled || !result.assets[0]) return { status: 'cancelled' };
   const asset = result.assets[0];
   if (asset.size != null && asset.size > MAX_BACKUP_BYTES) throw new RestoreFailure('restore.invalidFile');
+  if (Platform.OS === 'web') {
+    if (!asset.file) throw new RestoreFailure('restore.invalidFile');
+    const summary = await restoreBackup(parseBackup(await asset.file.text()));
+    return { status: 'restored', summary };
+  }
   const file = new File(asset.uri);
   let text: string;
   try {

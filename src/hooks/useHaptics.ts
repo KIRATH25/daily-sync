@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
 import { usePreferences } from '@/store/preferences';
@@ -14,7 +15,8 @@ export function useHaptics() {
   const enabled = preferences.haptics;
   return useMemo(() => {
     const fire = (kind: HapticKind) => {
-      if (!enabled) return;
+      // Browsers (incl. iOS Safari) have no haptics API; skip silently on web.
+      if (!enabled || Platform.OS === 'web') return;
       const run = (): Promise<void> => {
         switch (kind) {
           case 'selection':

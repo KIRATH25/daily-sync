@@ -51,6 +51,19 @@ export const MAX_SCHEDULED = 60;
 const MOOD_SNOOZE_KEY = 'mood.snoozeUntil';
 const MOOD_SKIP_KEY = 'mood.skippedDate';
 
+/**
+ * OS-scheduled local notifications exist only in the native apps. A web app
+ * (including an iOS Home Screen web app) cannot schedule reminders that fire
+ * while it is closed, so on web every OS call below is a no-op and the app
+ * relies on in-app prompts instead.
+ */
+export const NOTIFICATIONS_SUPPORTED = Platform.OS !== 'web';
+
+/** Last notification tap; always null on web. */
+export const useNotificationResponse: () => Notifications.NotificationResponse | null | undefined = NOTIFICATIONS_SUPPORTED
+  ? Notifications.useLastNotificationResponse
+  : () => null;
+
 export const CHANNEL_REMINDERS = 'reminders';
 export const CHANNEL_CHECKINS = 'checkins';
 export const CATEGORY_MOOD = 'mood_checkin';
@@ -78,6 +91,7 @@ export function setForegroundMoodListener(listener: (() => void) | null): void {
 }
 
 export async function configureNotifications(language: Preferences['language']): Promise<void> {
+  if (!NOTIFICATIONS_SUPPORTED) return;
   Notifications.setNotificationHandler({
     handleNotification: async (notification) => {
       const category = notification.request.content.data?.category;
@@ -127,12 +141,14 @@ async function ensureChannels(language: Preferences['language']): Promise<void> 
 export type PermissionState = 'granted' | 'denied' | 'undetermined';
 
 export async function getPermissionState(): Promise<PermissionState> {
+  if (!NOTIFICATIONS_SUPPORTED) return 'denied';
   const settings = await Notifications.getPermissionsAsync();
   if (settings.granted) return 'granted';
   return settings.canAskAgain ? 'undetermined' : 'denied';
 }
 
 export async function requestPermission(): Promise<PermissionState> {
+  if (!NOTIFICATIONS_SUPPORTED) return 'denied';
   const current = await Notifications.getPermissionsAsync();
   if (current.granted) return 'granted';
   if (!current.canAskAgain) return 'denied';
@@ -382,6 +398,7 @@ let syncChain: Promise<void> = Promise.resolve();
 
 /** Serialised so overlapping triggers cannot double-schedule. */
 export function syncNotifications(): Promise<void> {
+  if (!NOTIFICATIONS_SUPPORTED) return Promise.resolve();
   syncChain = syncChain.then(runSync).catch((error: unknown) => {
     console.error('Reminder sync failed', error);
   });
@@ -510,6 +527,7 @@ export async function moodPromptState(timeZone: string): Promise<{ skippedDate: 
 
 /** Fires a test notification in ~5 seconds so users can verify delivery. */
 export async function sendTestNotification(title: string, body: string): Promise<void> {
+  if (!NOTIFICATIONS_SUPPORTED) return;
   await Notifications.scheduleNotificationAsync({
     content: { title, body, data: { route: '/notifications', category: 'system' } },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, channelId: CHANNEL_REMINDERS },

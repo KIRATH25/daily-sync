@@ -1071,6 +1071,9 @@ export const hi: Record<TKey, string> = {
   'notif.moodBody': '30 सेकंड में अपने दिन पर विचार करें।',
   'notif.moodSnoozedBody': 'आपका शाम का चेक-इन तैयार है।',
 
+  'web.notifTitle': 'वेब ऐप में रिमाइंडर',
+  'web.notifBody': 'iPhone पर वेब ऐप बंद होने पर तय रिमाइंडर नहीं भेज सकते। तय समय के बाद Daily Sync खोलने पर शाम का चेक-इन अब भी दिखेगा। फ़ोन सूचनाओं के लिए इंस्टॉल किया Android ऐप या Expo Go इस्तेमाल करें।',
+
   'lock.title': 'Daily Sync लॉक है',
   'lock.body': 'फ़िंगरप्रिंट, चेहरे या डिवाइस पिन से खोलें।',
   'lock.unlock': 'खोलें',

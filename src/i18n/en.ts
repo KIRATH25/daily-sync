@@ -1090,6 +1090,9 @@ export const en = {
   'notif.moodBody': 'Take 30 seconds to reflect.',
   'notif.moodSnoozedBody': 'Your evening check-in is ready.',
 
+  'web.notifTitle': 'Reminders in the web app',
+  'web.notifBody': 'Web apps on iPhone can’t send scheduled reminders while closed. Your evening check-in still pops up when you open Daily Sync after the set time. For phone notifications, use the installed Android app or Expo Go.',
+
   'lock.title': 'Daily Sync is locked',
   'lock.body': 'Unlock with your fingerprint, face or device PIN.',
   'lock.unlock': 'Unlock',

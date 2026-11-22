@@ -19,7 +19,7 @@ import { useClock } from '@/hooks/useClock';
 import { useI18n } from '@/i18n';
 import { LIMITS, sanitizeText } from '@/lib/validation';
 import { pickAndRestoreBackup } from '@/services/backup';
-import { requestPermission } from '@/services/notifications';
+import { NOTIFICATIONS_SUPPORTED, requestPermission } from '@/services/notifications';
 import { loadPreferences, usePreferences, type Language } from '@/store/preferences';
 import { usePalette, useTheme } from '@/theme/ThemeProvider';
 import { radius, space } from '@/theme/tokens';
@@ -187,7 +187,9 @@ export default function OnboardingScreen() {
                 <View style={styles.flex}>
                   <Text variant="title">{t('onboarding.notifTitle')}</Text>
                   <Text variant="small" tone="secondary">
-                    {notifState === 'granted'
+                    {!NOTIFICATIONS_SUPPORTED
+                      ? t('web.notifBody')
+                      : notifState === 'granted'
                       ? t('onboarding.notifGranted')
                       : notifState === 'denied'
                         ? t('onboarding.notifDenied')
@@ -195,7 +197,7 @@ export default function OnboardingScreen() {
                   </Text>
                 </View>
               </View>
-              {notifState === 'idle' ? (
+              {notifState === 'idle' && NOTIFICATIONS_SUPPORTED ? (
                 <PremiumButton label={t('onboarding.notifAllow')} icon={BellRing} variant="secondary" onPress={askNotifications} />
               ) : null}
             </View>

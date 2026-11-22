@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import * as Notifications from 'expo-notifications';
 
 import { evaluateAndStoreAchievements, watchForAchievementChanges } from '@/services/achievements';
 import {
@@ -10,6 +9,7 @@ import {
   configureNotifications,
   snoozeMood,
   syncNotifications,
+  useNotificationResponse,
   watchForReminderChanges,
 } from '@/services/notifications';
 import { usePreferences } from '@/store/preferences';
@@ -32,7 +32,7 @@ export function AppShell() {
   const { reduceMotion } = useTheme();
   const { preferences } = usePreferences();
   const onboarded = preferences.onboardingComplete;
-  const response = Notifications.useLastNotificationResponse();
+  const response = useNotificationResponse();
   const handledResponse = useRef<string | null>(null);
 
   // Background services: reminders + achievements, refreshed on foreground.

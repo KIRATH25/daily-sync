@@ -6,6 +6,7 @@
  * the lock off. Note: this protects access through the app UI; the SQLite
  * file itself is protected by Android's app sandbox, not by encryption.
  */
+import { Platform } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 
@@ -17,7 +18,11 @@ export interface LockSettings {
   journalLock: boolean;
 }
 
+/** Device authentication and SecureStore are native-only; locks are hidden on web. */
+export const LOCKS_SUPPORTED = Platform.OS !== 'web';
+
 export async function readLockSettings(): Promise<LockSettings> {
+  if (!LOCKS_SUPPORTED) return { appLock: false, journalLock: false };
   try {
     const [app, journal] = await Promise.all([SecureStore.getItemAsync(APP_LOCK_KEY), SecureStore.getItemAsync(JOURNAL_LOCK_KEY)]);
     return { appLock: app === '1', journalLock: journal === '1' };
@@ -27,12 +32,14 @@ export async function readLockSettings(): Promise<LockSettings> {
 }
 
 export async function writeLockSetting(kind: keyof LockSettings, enabled: boolean): Promise<void> {
+  if (!LOCKS_SUPPORTED) return;
   await SecureStore.setItemAsync(kind === 'appLock' ? APP_LOCK_KEY : JOURNAL_LOCK_KEY, enabled ? '1' : '0');
 }
 
 export type AuthAvailability = 'available' | 'no-hardware' | 'not-enrolled';
 
 export async function authAvailability(): Promise<AuthAvailability> {
+  if (!LOCKS_SUPPORTED) return 'no-hardware';
   const [hardware, enrolled, level] = await Promise.all([
     LocalAuthentication.hasHardwareAsync(),
     LocalAuthentication.isEnrolledAsync(),

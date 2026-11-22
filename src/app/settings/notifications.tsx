@@ -15,6 +15,7 @@ import { useI18n } from '@/i18n';
 import {
   getExactAlarmState,
   getPermissionState,
+  NOTIFICATIONS_SUPPORTED,
   requestExactAlarm,
   requestPermission,
   sendTestNotification,
@@ -60,6 +61,34 @@ export default function NotificationSettingsScreen() {
     { key: 'remindersCountdowns', icon: Hourglass, title: t('settings.countdownReminders') },
     { key: 'remindersWorkouts', icon: Dumbbell, title: t('settings.workoutReminders') },
   ];
+
+  if (!NOTIFICATIONS_SUPPORTED) {
+    // Web app: no OS reminders, but the evening check-in still appears in-app.
+    return (
+      <Screen header={<ScreenHeader title={t('settings.notifications')} />}>
+        <DSCard glow>
+          <View style={styles.inline}>
+            <BellRing size={20} color={palette.accentText} />
+            <Text variant="title">{t('web.notifTitle')}</Text>
+          </View>
+          <Text variant="small" tone="secondary" style={styles.spaced}>
+            {t('web.notifBody')}
+          </Text>
+        </DSCard>
+        <SectionHeader title={t('settings.eveningReflection')} />
+        <DSCard>
+          <SettingRow
+            icon={Moon}
+            title={t('settings.moodReminder')}
+            subtitle={preferences.moodReminderEnabled ? t('settings.moodReminderAt', { time: formatTime(preferences.moodReminderMinute) }) : t('common.off')}
+            onPress={() => setPickingMood(true)}
+            right={<DSSwitch label={t('settings.moodReminder')} value={preferences.moodReminderEnabled} onChange={(value) => set('moodReminderEnabled', value)} />}
+          />
+        </DSCard>
+        <TimePickerSheet visible={pickingMood} value={preferences.moodReminderMinute} onClose={() => setPickingMood(false)} onChange={(value) => set('moodReminderMinute', value)} title={t('settings.moodReminder')} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen header={<ScreenHeader title={t('settings.notifications')} />}>

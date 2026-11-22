@@ -51,6 +51,12 @@
       "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "Daily Sync",
+      "shortName": "Daily Sync",
+      "themeColor": "#0C0D0F",
+      "backgroundColor": "#0C0D0F",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [

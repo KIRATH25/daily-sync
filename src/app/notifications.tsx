@@ -35,7 +35,7 @@ import { useLiveQuery } from '@/hooks/useLiveQuery';
 import { useI18n, type TKey } from '@/i18n';
 import { addDays } from '@/lib/dates';
 import { todayKey } from '@/lib/timezone';
-import { getPermissionState, requestPermission, syncNotifications, type PermissionState } from '@/services/notifications';
+import { getPermissionState, NOTIFICATIONS_SUPPORTED, requestPermission, syncNotifications, type PermissionState } from '@/services/notifications';
 import { usePreferences } from '@/store/preferences';
 import { usePalette } from '@/theme/ThemeProvider';
 import { radius, space } from '@/theme/tokens';
@@ -122,7 +122,19 @@ export default function NotificationsScreen() {
 
   return (
     <Screen header={header}>
-      {permission && permission !== 'granted' ? (
+      {!NOTIFICATIONS_SUPPORTED ? (
+        <DSCard tone="alt">
+          <View style={styles.permission}>
+            <BellOff size={22} color={palette.accentText} />
+            <View style={styles.flex}>
+              <Text variant="title">{t('web.notifTitle')}</Text>
+              <Text variant="small" tone="secondary">
+                {t('web.notifBody')}
+              </Text>
+            </View>
+          </View>
+        </DSCard>
+      ) : permission && permission !== 'granted' ? (
         <DSCard glow>
           <View style={styles.permission}>
             <BellOff size={22} color={palette.accentText} />

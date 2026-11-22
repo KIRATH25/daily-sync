@@ -23,7 +23,7 @@ import { useI18n, type TKey } from '@/i18n';
 import { formatClock } from '@/lib/format';
 import { elapsedMs, endsAt, nextBreak, pause, remainingMs, resume, type ActiveFocus } from '@/lib/focusTimer';
 import { todayKey } from '@/lib/timezone';
-import { CHANNEL_REMINDERS } from '@/services/notifications';
+import { CHANNEL_REMINDERS, NOTIFICATIONS_SUPPORTED } from '@/services/notifications';
 import { usePreferences } from '@/store/preferences';
 import { usePalette } from '@/theme/ThemeProvider';
 import { space } from '@/theme/tokens';
@@ -70,7 +70,7 @@ export default function FocusScreen() {
 
   const scheduleEndAlert = async (state: ActiveFocus): Promise<string | null> => {
     const end = endsAt(state, Date.now());
-    if (!end) return null;
+    if (!end || !NOTIFICATIONS_SUPPORTED) return null;
     try {
       return await Notifications.scheduleNotificationAsync({
         content: { title: t(state.mode === 'focus' ? 'focus.doneTitle' : 'focus.breakDoneTitle'), body: state.label ?? t('focus.doneBody'), data: { route: '/focus', category: 'system' } },
@@ -81,7 +81,7 @@ export default function FocusScreen() {
     }
   };
   const cancelAlert = async (state: ActiveFocus | null) => {
-    if (state?.notificationId) await Notifications.cancelScheduledNotificationAsync(state.notificationId).catch(() => undefined);
+    if (state?.notificationId && NOTIFICATIONS_SUPPORTED) await Notifications.cancelScheduledNotificationAsync(state.notificationId).catch(() => undefined);
   };
 
   // Restore a running/paused timer.

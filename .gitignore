@@ -47,3 +47,6 @@ coverage/
 .claude/
 .env
 .env.*
+
+# web export
+dist/

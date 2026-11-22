@@ -42,7 +42,7 @@ import { computeJourneyStats } from '@/lib/journey';
 import { deviceTimeZone, isValidTimeZone, offsetMinutesAt } from '@/lib/timezone';
 import { LIMITS, sanitizeText } from '@/lib/validation';
 import { deleteStoredImage, pickImage } from '@/services/media';
-import { authAvailability, authenticate, readLockSettings, writeLockSetting, type LockSettings } from '@/services/security';
+import { authAvailability, authenticate, LOCKS_SUPPORTED, readLockSettings, writeLockSetting, type LockSettings } from '@/services/security';
 import { usePreferences } from '@/store/preferences';
 import { usePalette } from '@/theme/ThemeProvider';
 import { radius, space } from '@/theme/tokens';
@@ -237,8 +237,12 @@ export default function ProfileScreen() {
 
       <SectionHeader title={t('profile.privacy')} />
       <DSCard>
-        <SettingRow icon={LockKeyhole} title={t('security.appLock')} subtitle={t('security.appLockSub')} right={<DSSwitch label={t('security.appLock')} value={locks.appLock} onChange={(value) => void toggleLock('appLock', value)} />} />
-        <SettingRow icon={Fingerprint} title={t('security.journalLock')} subtitle={t('security.journalLockSub')} right={<DSSwitch label={t('security.journalLock')} value={locks.journalLock} onChange={(value) => void toggleLock('journalLock', value)} />} />
+        {LOCKS_SUPPORTED ? (
+          <>
+            <SettingRow icon={LockKeyhole} title={t('security.appLock')} subtitle={t('security.appLockSub')} right={<DSSwitch label={t('security.appLock')} value={locks.appLock} onChange={(value) => void toggleLock('appLock', value)} />} />
+            <SettingRow icon={Fingerprint} title={t('security.journalLock')} subtitle={t('security.journalLockSub')} right={<DSSwitch label={t('security.journalLock')} value={locks.journalLock} onChange={(value) => void toggleLock('journalLock', value)} />} />
+          </>
+        ) : null}
         <SettingRow icon={DatabaseBackup} title={t('backup.title')} subtitle={t('backup.rowSub')} onPress={() => router.push('/settings/backup')} right={<ChevronRight size={18} color={palette.textMuted} />} />
         <SettingRow icon={ShieldCheck} title={t('privacy.title')} subtitle={t('privacy.rowSub')} onPress={() => router.push('/settings/privacy')} right={<ChevronRight size={18} color={palette.textMuted} />} />
       </DSCard>
@@ -247,7 +251,9 @@ export default function ProfileScreen() {
       <DSCard>
         <SettingRow icon={Sparkles} title="Daily Sync" subtitle={t('profile.version', { version })} right={<Pill label={t('profile.offline')} tone="muted" />} />
         <SettingRow icon={HelpCircle} title={t('profile.help')} subtitle={t('profile.helpSub')} onPress={() => router.push('/settings/privacy')} right={<ChevronRight size={18} color={palette.textMuted} />} />
-        <SettingRow icon={Bell} title={t('profile.systemSettings')} subtitle={t('profile.systemSettingsSub')} onPress={() => Linking.openSettings()} right={<ChevronRight size={18} color={palette.textMuted} />} />
+        {LOCKS_SUPPORTED ? (
+          <SettingRow icon={Bell} title={t('profile.systemSettings')} subtitle={t('profile.systemSettingsSub')} onPress={() => Linking.openSettings()} right={<ChevronRight size={18} color={palette.textMuted} />} />
+        ) : null}
       </DSCard>
       <View style={styles.footer}>
         <Text variant="label" tone="accent" latin>
